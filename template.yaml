@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS
+
+  Sample SAM Template for AWS
+
+# Edit these to match your environment
+Globals:
+  Function:
+    Timeout: 120
+    Environment:
+      Variables:
+        ROLE_NAME: arn:aws:iam::123456789012:role/MarketplaceCommerceAnalyticsRole
+        DESTINATION_BUCKET: aws-marketplace-cas-bucket
+        DESTINATION_PREFIX: aws-marketplace-cas
+        SNS_TOPIC: arn:aws:sns:us-west-2:123456789012:sns-aws-marketplace-cas
+
+Resources:
+  GenerateDataSetsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: generate_data_sets_function
+      Handler: generate_data_sets/app.lambda_handler
+      Runtime: python3.7
+      Events:
+        GenerateDataSets:
+          Type: Schedule
+          Properties:
+            Schedule: cron(30 0 * * ? *)
+
+Outputs:
+  GenerateDataSetsFunction:
+    Description: "AWS Generate Data Sets Lambda Function ARN"
+    Value: !GetAtt GenerateDataSetsFunction.Arn
+  GenerateDataSetsFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt GenerateDataSetsFunctionRole.Arn
